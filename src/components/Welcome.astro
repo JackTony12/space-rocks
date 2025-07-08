@@ -1,210 +1,936 @@
----
-import astroLogo from '../assets/astro.svg';
-import background from '../assets/background.svg';
----
+<!doctype html>
+<html lang='es'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Space Rocks - Juego de Nave Espacial</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap");
 
-<div id="container">
-	<img id="background" src={background.src} alt="" fetchpriority="high" />
-	<main>
-		<section id="hero">
-			<a href="https://astro.build"
-				><img src={astroLogo.src} width="115" height="48" alt="Astro Homepage" /></a
-			>
-			<h1>
-				To get started, open the <code><pre>src/pages</pre></code> directory in your project.
-			</h1>
-			<section id="links">
-				<a class="button" href="https://docs.astro.build">Read our docs</a>
-				<a href="https://astro.build/chat"
-					>Join our Discord <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36"
-						><path
-							fill="currentColor"
-							d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69Z"
-						></path></svg
-					>
-				</a>
-			</section>
-		</section>
-	</main>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-	<a href="https://astro.build/blog/astro-5/" id="news" class="box">
-		<svg width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg"
-			><path
-				d="M24.667 12c1.333 1.414 2 3.192 2 5.334 0 4.62-4.934 5.7-7.334 12C18.444 28.567 18 27.456 18 26c0-4.642 6.667-7.053 6.667-14Zm-5.334-5.333c1.6 1.65 2.4 3.43 2.4 5.333 0 6.602-8.06 7.59-6.4 17.334C13.111 27.787 12 25.564 12 22.666c0-4.434 7.333-8 7.333-16Zm-6-5.333C15.111 3.555 16 5.556 16 7.333c0 8.333-11.333 10.962-5.333 22-3.488-.774-6-4-6-8 0-8.667 8.666-10 8.666-20Z"
-				fill="#111827"></path></svg
-		>
-		<h2>What's New in Astro 5.0?</h2>
-		<p>
-			From content layers to server islands, click to learn more about the new features and
-			improvements in Astro 5.0
-		</p>
-	</a>
-</div>
+      body {
+        font-family: "Orbitron", monospace;
+        background: linear-gradient(
+          135deg,
+          #0c0c0c 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
 
-<style>
-	#background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		filter: blur(100px);
-	}
+      .game-container {
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+        padding: 20px;
+      }
 
-	#container {
-		font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-		height: 100%;
-	}
+      .screen {
+        display: none;
+        animation: fadeIn 0.5s ease-in;
+      }
 
-	main {
-		height: 100%;
-		display: flex;
-		justify-content: center;
-	}
+      .screen.active {
+        display: block;
+      }
 
-	#hero {
-		display: flex;
-		align-items: start;
-		flex-direction: column;
-		justify-content: center;
-		padding: 16px;
-	}
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-	h1 {
-		font-size: 22px;
-		margin-top: 0.25em;
-	}
+      h1 {
+        font-size: 3em;
+        font-weight: 900;
+        margin-bottom: 20px;
+        text-shadow: 0 0 20px #00ffff;
+        background: linear-gradient(45deg, #00ffff, #ff00ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-	#links {
-		display: flex;
-		gap: 16px;
-	}
+      .input-group {
+        margin: 30px 0;
+      }
 
-	#links a {
-		display: flex;
-		align-items: center;
-		padding: 10px 12px;
-		color: #111827;
-		text-decoration: none;
-		transition: color 0.2s;
-	}
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+        color: #00ffff;
+      }
 
-	#links a:hover {
-		color: rgb(78, 80, 86);
-	}
+      input[type="text"] {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid #00ffff;
+        border-radius: 10px;
+        padding: 15px;
+        font-size: 1.1em;
+        color: #fff;
+        width: 100%;
+        max-width: 300px;
+        font-family: "Orbitron", monospace;
+        text-align: center;
+      }
 
-	#links a svg {
-		height: 1em;
-		margin-left: 8px;
-	}
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #ff00ff;
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+      }
 
-	#links a.button {
-		color: white;
-		background: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
-		box-shadow:
-			inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-			inset 0 -2px 0 rgba(0, 0, 0, 0.24);
-		border-radius: 10px;
-	}
+      .btn {
+        background: linear-gradient(45deg, #00ffff, #ff00ff);
+        border: none;
+        border-radius: 25px;
+        padding: 15px 30px;
+        font-size: 1.1em;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+        font-family: "Orbitron", monospace;
+        margin: 10px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+      }
 
-	#links a.button:hover {
-		color: rgb(230, 230, 230);
-		box-shadow: none;
-	}
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+      }
 
-	pre {
-		font-family:
-			ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono',
-			monospace;
-		font-weight: normal;
-		background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-		margin: 0;
-	}
+      .btn:active {
+        transform: translateY(0);
+      }
 
-	h2 {
-		margin: 0 0 1em;
-		font-weight: normal;
-		color: #111827;
-		font-size: 20px;
-	}
+      #gameCanvas {
+        border: 2px solid #00ffff;
+        border-radius: 10px;
+        background: #000;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        max-width: 100%;
+        height: auto;
+      }
 
-	p {
-		color: #4b5563;
-		font-size: 16px;
-		line-height: 24px;
-		letter-spacing: -0.006em;
-		margin: 0;
-	}
+      .game-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        font-weight: 700;
+      }
 
-	code {
-		display: inline-block;
-		background:
-			linear-gradient(66.77deg, #f3cddd 0%, #f5cee7 100%) padding-box,
-			linear-gradient(155deg, #d83333 0%, #f041ff 18%, #f5cee7 45%) border-box;
-		border-radius: 8px;
-		border: 1px solid transparent;
-		padding: 6px 8px;
-	}
+      .score {
+        color: #00ffff;
+      }
 
-	.box {
-		padding: 16px;
-		background: rgba(255, 255, 255, 1);
-		border-radius: 16px;
-		border: 1px solid white;
-	}
+      .player-name {
+        color: #ff00ff;
+      }
 
-	#news {
-		position: absolute;
-		bottom: 16px;
-		right: 16px;
-		max-width: 300px;
-		text-decoration: none;
-		transition: background 0.2s;
-		backdrop-filter: blur(50px);
-	}
+      .game-over-score {
+        font-size: 2em;
+        color: #ffff00;
+        margin: 20px 0;
+        text-shadow: 0 0 10px #ffff00;
+      }
 
-	#news:hover {
-		background: rgba(255, 255, 255, 0.55);
-	}
+      .leaderboard {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-	@media screen and (max-height: 368px) {
-		#news {
-			display: none;
-		}
-	}
+      .leaderboard h2 {
+        color: #00ffff;
+        margin-bottom: 20px;
+      }
 
-	@media screen and (max-width: 768px) {
-		#container {
-			display: flex;
-			flex-direction: column;
-		}
+      .leaderboard-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        margin: 5px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid #00ffff;
+      }
 
-		#hero {
-			display: block;
-			padding-top: 10%;
-		}
+      .leaderboard-item:first-child {
+        border-left-color: #ffff00;
+        background: rgba(255, 255, 0, 0.1);
+      }
 
-		#links {
-			flex-wrap: wrap;
-		}
+      .leaderboard-item:nth-child(2) {
+        border-left-color: #c0c0c0;
+      }
 
-		#links a.button {
-			padding: 14px 18px;
-		}
+      .leaderboard-item:nth-child(3) {
+        border-left-color: #cd7f32;
+      }
 
-		#news {
-			right: 16px;
-			left: 16px;
-			bottom: 2.5rem;
-			max-width: 100%;
-		}
+      .controls {
+        margin-top: 20px;
+        font-size: 0.9em;
+        color: #aaa;
+      }
 
-		h1 {
-			line-height: 1.5;
-		}
-	}
-</style>
+      .loading {
+        color: #00ffff;
+        margin: 20px 0;
+      }
+
+      .mobile-controls {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+      }
+
+      .mobile-controls.active {
+        display: flex;
+        gap: 20px;
+      }
+
+      .arrow-btn {
+        width: 80px;
+        height: 80px;
+        background: rgba(0, 255, 255, 0.2);
+        border: 2px solid #00ffff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2em;
+        color: #00ffff;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .arrow-btn:active {
+        background: rgba(0, 255, 255, 0.4);
+        transform: scale(0.95);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2em;
+        }
+
+        .game-info {
+          font-size: 1em;
+        }
+
+        .btn {
+          padding: 12px 24px;
+          font-size: 1em;
+        }
+
+        #gameCanvas {
+          max-width: 100%;
+        }
+
+        .mobile-controls {
+          display: flex;
+          gap: 15px;
+        }
+
+        .arrow-btn {
+          width: 70px;
+          height: 70px;
+          font-size: 1.8em;
+        }
+      }
+
+      /* Efectos de partículas */
+      .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: #fff;
+        border-radius: 50%;
+        animation: twinkle 2s infinite;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class='stars' id='stars'></div>
+
+    <div class='game-container'>
+      <!-- Pantalla de Inicio -->
+      <div id='startScreen' class='screen active'>
+        <h1>🚀 SPACE ROCKS</h1>
+        <div class='input-group'>
+          <label for='playerName'>Pone tu nombre:</label>
+          <input
+            type='text'
+            id='playerName'
+            placeholder='Nombre del piloto'
+            maxlength='20'
+          />
+        </div>
+        <button class='btn' id='startGameBtn'>!Dale ya!</button>
+        <button class='btn' id='showLeaderboardBtn'>RANKING</button>
+        <div class='controls'>
+          <p>🎮 Controles: Flechas ← → del teclado o botones móviles</p>
+          <p>
+            🎯 Objetivo: Esquiva los meteoritos y sobrevive el mayor tiempo
+            posible
+          </p>
+          <p>⚡ ¡La dificultad aumenta rápidamente!</p>
+        </div>
+      </div>
+
+      <!-- Pantalla de Juego -->
+      <div id='gameScreen' class='screen'>
+        <div class='game-info'>
+          <div class='player-name'>👨‍🚀 <span id='currentPlayer'></span></div>
+          <div class='score'>⭐ Puntaje: <span id='currentScore'>0</span></div>
+        </div>
+        <canvas id='gameCanvas' width='800' height='600'></canvas>
+        <div class='controls'>
+          <p>
+            ⚡ ¡La dificultad aumenta rápidamente! Usa las flechas del teclado o
+            los botones móviles
+          </p>
+        </div>
+      </div>
+
+      <!-- Controles móviles -->
+      <div class='mobile-controls' id='mobileControls'>
+        <div class='arrow-btn' id='leftArrow'>←</div>
+        <div class='arrow-btn' id='rightArrow'>→</div>
+      </div>
+
+      <!-- Pantalla de Game Over -->
+      <div id='gameOverScreen' class='screen'>
+        <h1>💥 GAME OVER</h1>
+        <div class='game-over-score'>
+          Tu puntaje: <span id='finalScore'>0</span>
+        </div>
+        <div class='loading' id='savingScore'>Guardando puntaje...</div>
+        <button class='btn' id='restartGameBtn'>JUGAR DE NUEVO</button>
+        <button class='btn' id='showLeaderboardBtn2'>VER RANKING</button>
+        <button class='btn' id='goToStartBtn'>MENÚ PRINCIPAL</button>
+      </div>
+
+      <!-- Pantalla de Ranking -->
+      <div id='leaderboardScreen' class='screen'>
+        <h1>🏆 RANKING</h1>
+        <div class='leaderboard'>
+          <h2>Top 10 Mejores Puntajes</h2>
+          <div id='leaderboardList'>
+            <div class='loading'>Cargando ranking...</div>
+          </div>
+        </div>
+        <button class='btn' id='goToStartBtn2'>VOLVER AL MENÚ</button>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type='module'>
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs,
+        updateDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+
+      // Configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCT0RLrdDABrbeMvllHyLtVMRZM4dthO9M",
+        authDomain: "space-rocks-f4125.firebaseapp.com",
+        projectId: "space-rocks-f4125",
+        storageBucket: "space-rocks-f4125.firebasestorage.app",
+        messagingSenderId: "882582684443",
+        appId: "1:882582684443:web:10044e7879d4c26f1b49be",
+      }
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig)
+      const db = getFirestore(app)
+
+      // Hacer db disponible globalmente
+      window.db = db
+      window.firebaseFunctions = {
+        collection,
+        addDoc,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs,
+        updateDoc,
+        serverTimestamp,
+      }
+    </script>
+
+    <script>
+      // @ts-nocheck
+      // @ts-ignore
+      // Obtener Firebase desde el módulo anterior
+      let db = window.db
+      let firebaseFunctions = window.firebaseFunctions
+
+      // Variables del juego
+      /** @type {HTMLCanvasElement | null} */
+      let canvas = document.getElementById("gameCanvas")
+      /** @type {CanvasRenderingContext2D | null} */
+      let ctx =
+        canvas && canvas instanceof HTMLCanvasElement
+          ? canvas.getContext("2d")
+          : null
+      let gameRunning = false
+      /** @type {number | undefined} */
+      let animationId
+      let currentPlayer = ""
+      let score = 0
+      let gameSpeed = 1
+      let meteorSpawnRate = 0.015 // Frecuencia inicial de aparición
+      let gameTime = 0
+
+      // Objetos del juego
+      let ship = {
+        x:
+          canvas && canvas instanceof HTMLCanvasElement
+            ? canvas.width / 2 - 25
+            : 375,
+        y:
+          canvas && canvas instanceof HTMLCanvasElement
+            ? canvas.height - 80
+            : 520,
+        width: 50,
+        height: 60,
+        speed: 7, // Aumentado de 5 a 7 para respuesta más rápida
+      }
+
+      /** @type {Array<{x: number, y: number, width: number, height: number, speed: number, rotation: number}>} */
+      let meteors = []
+      /** @type {Array<{x: number, y: number, vx: number, vy: number, life: number, maxLife: number}>} */
+      let particles = []
+      /** @type {{[key: string]: boolean}} */
+      let keys = {}
+
+      // Crear estrellas de fondo
+      function createStars() {
+        const starsContainer = document.getElementById("stars")
+        if (!starsContainer) return
+        for (let i = 0; i < 100; i++) {
+          const star = document.createElement("div")
+          star.className = "star"
+          star.style.left = Math.random() * 100 + "%"
+          star.style.top = Math.random() * 100 + "%"
+          star.style.animationDelay = Math.random() * 2 + "s"
+          starsContainer.appendChild(star)
+        }
+      }
+
+      // Funciones de navegación
+      function showScreen(screenId: string) {
+        document.querySelectorAll(".screen").forEach((screen) => {
+          screen.classList.remove("active")
+        })
+        const screenEl = document.getElementById(screenId)
+        if (screenEl) screenEl.classList.add("active")
+        // Mostrar controles móviles solo en pantalla de juego
+        const mobileControls = document.getElementById("mobileControls")
+        if (mobileControls) {
+          if (screenId === "gameScreen") {
+            mobileControls.classList.add("active")
+          } else {
+            mobileControls.classList.remove("active")
+          }
+        }
+      }
+
+      function startGame() {
+        const playerNameInput = document.getElementById(
+          "playerName"
+        ) as HTMLInputElement
+        const playerName = playerNameInput ? playerNameInput.value.trim() : ""
+        if (!playerName) {
+          alert("Por favor ingresa tu nombre")
+          return
+        }
+        currentPlayer = playerName
+        const currentPlayerEl = document.getElementById("currentPlayer")
+        if (currentPlayerEl) currentPlayerEl.textContent = currentPlayer
+        score = 0
+        gameSpeed = 1
+        meteorSpawnRate = 0.015
+        gameTime = 0
+        // Reiniciar objetos
+        ship.x =
+          canvas && canvas instanceof HTMLCanvasElement
+            ? canvas.width / 2 - 25
+            : 375
+        meteors = []
+        particles = []
+        showScreen("gameScreen")
+        gameRunning = true
+        gameLoop()
+      }
+
+      function restartGame() {
+        startGame()
+      }
+
+      function goToStart() {
+        showScreen("startScreen")
+      }
+
+      function showLeaderboard() {
+        showScreen("leaderboardScreen")
+        loadLeaderboard()
+      }
+
+      // Funciones del juego
+      function createMeteor() {
+        meteors.push({
+          x:
+            canvas && canvas instanceof HTMLCanvasElement
+              ? Math.random() * (canvas.width - 40)
+              : Math.random() * (800 - 40),
+          y: -40,
+          width: 40,
+          height: 40,
+          speed: 3 + Math.random() * 4 * gameSpeed, // Velocidad base aumentada
+          rotation: Math.random() * Math.PI * 2,
+        })
+      }
+
+      function createParticle(x: number, y: number) {
+        for (let i = 0; i < 8; i++) {
+          particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 30,
+            maxLife: 30,
+          })
+        }
+      }
+
+      function updateGame() {
+        gameTime++
+        // Mover nave
+        if (keys["ArrowLeft"] && ship.x > 0) {
+          ship.x -= ship.speed
+        }
+        if (
+          keys["ArrowRight"] &&
+          canvas &&
+          canvas instanceof HTMLCanvasElement &&
+          ship.x < canvas.width - ship.width
+        ) {
+          ship.x += ship.speed
+        }
+        // Aumentar dificultad progresivamente
+        gameSpeed = 1 + gameTime / 1800
+        meteorSpawnRate = 0.015 + gameTime / 18000
+        if (meteorSpawnRate > 0.15) meteorSpawnRate = 0.15
+        if (gameSpeed > 8) gameSpeed = 8
+        if (Math.random() < meteorSpawnRate) {
+          createMeteor()
+        }
+        // Actualizar meteoritos
+        meteors.forEach((meteor, meteorIndex) => {
+          meteor.y += meteor.speed
+          meteor.rotation += 0.1
+          if (
+            canvas &&
+            canvas instanceof HTMLCanvasElement &&
+            meteor.y > canvas.height
+          ) {
+            meteors.splice(meteorIndex, 1)
+            score += 20
+          }
+          if (
+            meteor.x < ship.x + ship.width &&
+            meteor.x + meteor.width > ship.x &&
+            meteor.y < ship.y + ship.height &&
+            meteor.y + meteor.height > ship.y
+          ) {
+            createParticle(ship.x + ship.width / 2, ship.y + ship.height / 2)
+            gameOver()
+          }
+        })
+        // Actualizar partículas
+        particles.forEach((particle, particleIndex) => {
+          particle.x += particle.vx
+          particle.y += particle.vy
+          particle.life--
+          if (particle.life <= 0) {
+            particles.splice(particleIndex, 1)
+          }
+        })
+        score += 2
+        const currentScoreEl = document.getElementById("currentScore")
+        if (currentScoreEl) currentScoreEl.textContent = score.toString()
+      }
+
+      function drawGame() {
+        if (!ctx || !canvas || !(canvas instanceof HTMLCanvasElement)) return
+        ctx.fillStyle = "#000"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = "#fff"
+        for (let i = 0; i < 50; i++) {
+          const x = (i * 37) % canvas.width
+          const y = (i * 23 + Date.now() * 0.05) % canvas.height
+          ctx.fillRect(x, y, 1, 1)
+        }
+        // Dibujar nave
+        ctx.fillStyle = "#00ffff"
+        ctx.fillRect(ship.x + 20, ship.y, 10, 40)
+        ctx.fillRect(ship.x, ship.y + 20, 50, 20)
+        ctx.fillRect(ship.x + 10, ship.y + 40, 30, 20)
+        ctx.fillStyle = "#ff6600"
+        ctx.fillRect(ship.x + 5, ship.y + 55, 8, 10)
+        ctx.fillRect(ship.x + 37, ship.y + 55, 8, 10)
+        meteors.forEach((meteor) => {
+          ctx.save()
+          ctx.translate(
+            meteor.x + meteor.width / 2,
+            meteor.y + meteor.height / 2
+          )
+          ctx.rotate(meteor.rotation)
+          ctx.fillStyle = "#8B4513"
+          ctx.fillRect(
+            -meteor.width / 2,
+            -meteor.height / 2,
+            meteor.width,
+            meteor.height
+          )
+          ctx.fillStyle = "#654321"
+          ctx.fillRect(
+            -meteor.width / 2 + 5,
+            -meteor.height / 2 + 5,
+            meteor.width - 10,
+            meteor.height - 10
+          )
+          ctx.restore()
+        })
+        particles.forEach((particle) => {
+          ctx.fillStyle = `rgba(255, ${Math.floor((255 * particle.life) / particle.maxLife)}, 0, ${particle.life / particle.maxLife})`
+          ctx.fillRect(particle.x, particle.y, 3, 3)
+        })
+      }
+
+      function gameLoop() {
+        if (!gameRunning) return
+        updateGame()
+        drawGame()
+        animationId = requestAnimationFrame(gameLoop)
+      }
+
+      function gameOver() {
+        gameRunning = false
+        if (animationId !== undefined) cancelAnimationFrame(animationId)
+        const finalScoreEl = document.getElementById("finalScore")
+        if (finalScoreEl) finalScoreEl.textContent = score.toString()
+        showScreen("gameOverScreen")
+        saveScore()
+      }
+
+      // Funciones de base de datos
+      async function saveScore() {
+        const savingElement = document.getElementById("savingScore")
+        try {
+          if (db && firebaseFunctions) {
+            // Verificar si el jugador ya existe y actualizar o agregar
+            const scoresRef = firebaseFunctions.collection(db, "scores")
+            const q = firebaseFunctions.query(
+              scoresRef,
+              firebaseFunctions.where("name", "==", currentPlayer)
+            )
+            const querySnapshot = await firebaseFunctions.getDocs(q)
+
+            if (!querySnapshot.empty) {
+              // Actualizar solo si el nuevo puntaje es mayor
+              const existingDoc = querySnapshot.docs[0]
+              const existingScore = existingDoc.data().score
+
+              if (score > existingScore) {
+                await firebaseFunctions.updateDoc(existingDoc.ref, {
+                  score: score,
+                  timestamp: firebaseFunctions.serverTimestamp(),
+                })
+              }
+            } else {
+              // Agregar nuevo jugador
+              await firebaseFunctions.addDoc(scoresRef, {
+                name: currentPlayer,
+                score: score,
+                timestamp: firebaseFunctions.serverTimestamp(),
+              })
+            }
+          } else {
+            // Fallback a localStorage si Firebase no está disponible
+            let scores = JSON.parse(
+              localStorage.getItem("spaceGameScores") || "[]"
+            )
+            const existingIndex = scores.findIndex(
+              (s) => s.name === currentPlayer
+            )
+
+            if (existingIndex !== -1) {
+              if (score > scores[existingIndex].score) {
+                scores[existingIndex] = {
+                  name: currentPlayer,
+                  score: score,
+                  timestamp: Date.now(),
+                }
+              }
+            } else {
+              scores.push({
+                name: currentPlayer,
+                score: score,
+                timestamp: Date.now(),
+              })
+            }
+            localStorage.setItem("spaceGameScores", JSON.stringify(scores))
+          }
+
+          if (savingElement) {
+            savingElement.textContent = "¡Puntaje guardado!"
+            savingElement.style.color = "#00ff00"
+          }
+        } catch (error) {
+          console.error("Error al guardar puntaje:", error)
+          if (savingElement) {
+            savingElement.textContent = "Error al guardar puntaje"
+            savingElement.style.color = "#ff0000"
+          }
+        }
+      }
+
+      async function loadLeaderboard() {
+        const leaderboardList = document.getElementById("leaderboardList")
+        if (!leaderboardList) return
+        leaderboardList.innerHTML =
+          '<div class="loading">Cargando ranking...</div>'
+        try {
+          let scores = []
+
+          if (db && firebaseFunctions) {
+            // Cargar desde Firebase
+            const scoresRef = firebaseFunctions.collection(db, "scores")
+            const q = firebaseFunctions.query(
+              scoresRef,
+              firebaseFunctions.orderBy("score", "desc"),
+              firebaseFunctions.limit(10)
+            )
+            const querySnapshot = await firebaseFunctions.getDocs(q)
+
+            querySnapshot.forEach((doc) => {
+              scores.push(doc.data())
+            })
+          } else {
+            // Cargar desde localStorage
+            scores = JSON.parse(localStorage.getItem("spaceGameScores") || "[]")
+            scores.sort((a, b) => b.score - a.score)
+            scores = scores.slice(0, 10)
+          }
+
+          if (scores.length === 0) {
+            leaderboardList.innerHTML =
+              '<div style="color: #888;">No hay puntajes registrados</div>'
+            return
+          }
+
+          leaderboardList.innerHTML = ""
+          scores.forEach((scoreData, index) => {
+            const item = document.createElement("div")
+            item.className = "leaderboard-item"
+            const position = index + 1
+            const medal =
+              position === 1
+                ? "🥇"
+                : position === 2
+                  ? "🥈"
+                  : position === 3
+                    ? "🥉"
+                    : `${position}.`
+            item.innerHTML = `
+                        <span>${medal} ${scoreData.name}</span>
+                        <span>${scoreData.score}</span>
+                    `
+            leaderboardList.appendChild(item)
+          })
+        } catch (error) {
+          console.error("Error al cargar ranking:", error)
+          leaderboardList.innerHTML =
+            '<div style="color: #ff0000;">Error al cargar el ranking</div>'
+        }
+      }
+
+      // Event listeners
+      document.addEventListener("keydown", (e) => {
+        keys[e.key] = true
+      })
+      document.addEventListener("keyup", (e) => {
+        keys[e.key] = false
+      })
+      // Controles táctiles para flechas móviles
+      const leftArrow = document.getElementById("leftArrow")
+      const rightArrow = document.getElementById("rightArrow")
+      if (leftArrow) {
+        leftArrow.addEventListener("touchstart", (e) => {
+          e.preventDefault()
+          keys["ArrowLeft"] = true
+        })
+        leftArrow.addEventListener("touchend", (e) => {
+          e.preventDefault()
+          keys["ArrowLeft"] = false
+        })
+        leftArrow.addEventListener("mousedown", (e) => {
+          e.preventDefault()
+          keys["ArrowLeft"] = true
+        })
+        leftArrow.addEventListener("mouseup", (e) => {
+          e.preventDefault()
+          keys["ArrowLeft"] = false
+        })
+      }
+      if (rightArrow) {
+        rightArrow.addEventListener("touchstart", (e) => {
+          e.preventDefault()
+          keys["ArrowRight"] = true
+        })
+        rightArrow.addEventListener("touchend", (e) => {
+          e.preventDefault()
+          keys["ArrowRight"] = false
+        })
+        rightArrow.addEventListener("mousedown", (e) => {
+          e.preventDefault()
+          keys["ArrowRight"] = true
+        })
+        rightArrow.addEventListener("mouseup", (e) => {
+          e.preventDefault()
+          keys["ArrowRight"] = false
+        })
+      }
+      // Controles táctiles en el canvas (mantener como alternativa)
+      if (canvas && canvas instanceof HTMLCanvasElement) {
+        canvas.addEventListener("touchstart", (e) => {
+          e.preventDefault()
+          const touch = e.touches[0]
+          const rect = canvas.getBoundingClientRect()
+          const x = touch.clientX - rect.left
+          if (x < canvas.width / 2) {
+            keys["ArrowLeft"] = true
+          } else {
+            keys["ArrowRight"] = true
+          }
+        })
+        canvas.addEventListener("touchend", (e) => {
+          e.preventDefault()
+          keys["ArrowLeft"] = false
+          keys["ArrowRight"] = false
+        })
+      }
+      // Permitir Enter para iniciar el juego
+      const playerNameInput = document.getElementById(
+        "playerName"
+      ) as HTMLInputElement
+      if (playerNameInput) {
+        playerNameInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            startGame()
+          }
+        })
+      }
+      // Responsive canvas
+      function resizeCanvas() {
+        const container = document.querySelector(".game-container")
+        const maxWidth = Math.min(800, window.innerWidth - 40)
+        const maxHeight = Math.min(600, window.innerHeight - 200)
+        if (canvas) {
+          canvas.style.width = maxWidth + "px"
+          canvas.style.height = maxWidth * 0.75 + "px"
+        }
+      }
+      window.addEventListener("resize", resizeCanvas)
+      // Event listeners para botones
+      document
+        .getElementById("startGameBtn")
+        ?.addEventListener("click", startGame)
+      document
+        .getElementById("showLeaderboardBtn")
+        ?.addEventListener("click", showLeaderboard)
+      document
+        .getElementById("showLeaderboardBtn2")
+        ?.addEventListener("click", showLeaderboard)
+      document
+        .getElementById("restartGameBtn")
+        ?.addEventListener("click", restartGame)
+      document
+        .getElementById("goToStartBtn")
+        ?.addEventListener("click", goToStart)
+      document
+        .getElementById("goToStartBtn2")
+        ?.addEventListener("click", goToStart)
+
+      // Inicialización
+      createStars()
+      resizeCanvas()
+      // Enfocar el input al cargar
+      if (playerNameInput) playerNameInput.focus()
+    </script>
+  </body>
+</html>
