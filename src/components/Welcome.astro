@@ -985,7 +985,7 @@
                       ? "🥉"
                       : `${position}.`
               item.innerHTML = `
-                        <span>${medal} ${scoreData.name}</span>
+                        <span>${medal} ${scoreData.name}: </span>
                         <span>${scoreData.score}</span>
                     `
               leaderboardList.appendChild(item)
@@ -1003,7 +1003,7 @@
               item.className = "leaderboard-item"
               const position = index + 1
               item.innerHTML = `
-                        <span>${position}. ${scoreData.name}</span>
+                        <span>${position}. ${scoreData.name}: </span>
                         <span>${scoreData.score}</span>
                     `
               allPlayersList.appendChild(item)
