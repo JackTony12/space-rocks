@@ -333,8 +333,8 @@
           <input
             type='text'
             id='playerName'
-            placeholder='Nombre del piloto'
-            maxlength='20'
+            placeholder='15 caracteres max'
+            maxlength='15'
           />
         </div>
         <button class='btn' id='startGameBtn'>!Dale ya!</button>
@@ -405,6 +405,23 @@
           </div>
         </div>
         <button class='btn' id='goToStartBtn2'>VOLVER AL MENÚ</button>
+      </div>
+      <div
+        id='badWordModal'
+        style='display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;'
+      >
+        <div
+          style='background:#222; color:#fff; border-radius:20px; padding:40px 30px; box-shadow:0 0 30px #ff00ff; text-align:center; max-width:90vw;'
+        >
+          <h2 style='color:#ff00ff; margin-bottom:20px;'>
+            No se permiten malas palabras<br /><span
+              style='font-size:1.2em; color:#ffff00;'>MAL EDUCADO</span
+            >
+          </h2>
+          <button id='closeBadWordModal' class='btn' style='margin-top:20px;'
+            >Cerrar</button
+          >
+        </div>
       </div>
     </div>
 
@@ -550,6 +567,7 @@
           "jodido",
           "jodida",
           "puto",
+          "perrita",
           "puta",
           "cabron",
           "cabrón",
@@ -658,6 +676,37 @@
           "matate",
           "mátate",
           "culo",
+          "verga",
+          "pito",
+          "coger",
+          "jodido",
+          "pisado",
+          "marica",
+          "piso",
+          "pendejito",
+          "pija",
+          "pijota",
+          "vergudo",
+          "vergon",
+          "cagar",
+          "cagado",
+          "cagon",
+          "guevon",
+          "wevon",
+          "webon",
+          "guebon",
+          "culero",
+          "chingado",
+          "cerote",
+          "pajero",
+          "mierdero",
+          "paja",
+          "sarna",
+          "sarnoso",
+          "desgraciado",
+          "maje",
+          "pupu",
+          "pepita",
         ]
         const lowerName = playerName.toLowerCase()
         const hasBadWord = badWords.some((bad) => lowerName.includes(bad))
@@ -666,7 +715,9 @@
           return
         }
         if (hasBadWord) {
-          alert("No se permiten malas palabras")
+          // alert("No se permiten malas palabras")
+          const modal = document.getElementById("badWordModal")
+          if (modal) modal.style.display = "flex"
           if (playerNameInput) playerNameInput.focus()
           return
         }
@@ -702,7 +753,7 @@
         loadLeaderboard()
       }
 
-      // Funciones del juego
+      // Funciones del juego papi
       function createMeteor() {
         meteors.push({
           x:
@@ -712,7 +763,7 @@
           y: -40,
           width: 40,
           height: 40,
-          speed: 3 + Math.random() * 4 * gameSpeed, // Velocidad base aumentada
+          speed: 3 + Math.random() * 4 * gameSpeed, // Velocidad base aumentada para que te pongas vivo
           rotation: Math.random() * Math.PI * 2,
         })
       }
@@ -744,7 +795,7 @@
         ) {
           ship.x += ship.speed
         }
-        // Aumentar dificultad progresivamente
+        // Aumentar dificultad progresivamente jijiji
         gameSpeed = 1 + gameTime / 1800
         meteorSpawnRate = 0.015 + gameTime / 18000
         if (meteorSpawnRate > 0.15) meteorSpawnRate = 0.15
@@ -752,7 +803,7 @@
         if (Math.random() < meteorSpawnRate) {
           createMeteor()
         }
-        // Actualizar meteoritos
+        // Actualizar meteoritos y bom papaaa
         meteors.forEach((meteor, meteorIndex) => {
           meteor.y += meteor.speed
           meteor.rotation += 0.1
@@ -774,7 +825,7 @@
             gameOver()
           }
         })
-        // Actualizar partículas
+        // Actualizar partículas para mas bonito
         particles.forEach((particle, particleIndex) => {
           particle.x += particle.vx
           particle.y += particle.vy
@@ -798,7 +849,7 @@
           const y = (i * 23 + Date.now() * 0.05) % canvas.height
           ctx.fillRect(x, y, 1, 1)
         }
-        // Dibujar nave
+        // Dibujar la nave, aunque me quedo bien fea jajaa
         ctx.fillStyle = "#00ffff"
         ctx.fillRect(ship.x + 20, ship.y, 10, 40)
         ctx.fillRect(ship.x, ship.y + 20, 50, 20)
@@ -851,12 +902,12 @@
         saveScore()
       }
 
-      // Funciones de base de datos
+      // Funciones de base de datos ji ji ji
       async function saveScore() {
         const savingElement = document.getElementById("savingScore")
         try {
           if (db && firebaseFunctions) {
-            // Verificar si el jugador ya existe y actualizar o agregar
+            // si este wey existe hacemos ..
             const scoresRef = firebaseFunctions.collection(db, "scores")
             const q = firebaseFunctions.query(
               scoresRef,
@@ -865,7 +916,7 @@
             const querySnapshot = await firebaseFunctions.getDocs(q)
 
             if (!querySnapshot.empty) {
-              // Actualizar solo si el nuevo puntaje es mayor
+              // si no superaste tu puntaje anterior entonces no vas entrar aqui perrito
               const existingDoc = querySnapshot.docs[0]
               const existingScore = existingDoc.data().score
 
@@ -1083,7 +1134,7 @@
           keys["ArrowRight"] = false
         })
       }
-      // Permitir Enter para iniciar el juego
+      // Permitir Enter para iniciar el juego siempre pensando en la comodiad pues
       const playerNameInput = document.getElementById(
         "playerName"
       ) as HTMLInputElement
@@ -1094,7 +1145,7 @@
           }
         })
       }
-      // Responsive canvas
+      // Responsive canvas para todo mi publico jaa
       function resizeCanvas() {
         const container = document.querySelector(".game-container")
         const maxWidth = Math.min(800, window.innerWidth - 40)
@@ -1130,6 +1181,14 @@
       resizeCanvas()
       // Enfocar el input al cargar
       if (playerNameInput) playerNameInput.focus()
+      // Modal de malas palabras
+      const badWordModal = document.getElementById("badWordModal")
+      const closeBadWordModal = document.getElementById("closeBadWordModal")
+      if (closeBadWordModal && badWordModal) {
+        closeBadWordModal.addEventListener("click", () => {
+          badWordModal.style.display = "none"
+        })
+      }
     </script>
   </body>
 </html>
