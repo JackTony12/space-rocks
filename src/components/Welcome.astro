@@ -197,6 +197,8 @@
         margin-top: 20px;
         font-size: 0.9em;
         color: #aaa;
+        text-align: center;
+        line-height: 2em;
       }
 
       .loading {
@@ -319,6 +321,9 @@
         background: rgba(255, 255, 255, 0.02) !important;
         color: #bbb;
       }
+      .myurl {
+        color: rgb(11, 11, 41);
+      }
     </style>
   </head>
   <body>
@@ -343,11 +348,14 @@
           <p>🎮 Controles: Flechas ← → del teclado o botones móviles</p>
           <p>
             🎯 Objetivo: Esquiva los meteoritos y sobrevive el mayor tiempo
-            posible se el mejor y derrota a todos los estudiantes del campus
-            CURC
+            posible, se el mejor y derrota a todo el campus CURC
           </p>
           <p>⚡¡La dificultad aumenta rápidamente!</p>
-          <a target='_blank' href='https://antonyleonel.com'>
+          <a
+            style='color:rgb(59, 59, 59)'
+            target='_blank'
+            href='https://antonyleonel.com'
+          >
             AntonyLeonel.com</a
           >
         </div>
@@ -369,7 +377,7 @@
       </div>
 
       <!-- Controles móviles -->
-      <div class='mobile-controls' id='mobileControls'>
+      <div class='mobile-controls' id='mobileControls' style='display:none;'>
         <div class='arrow-btn' id='leftArrow'>←</div>
         <div class='arrow-btn' id='rightArrow'>→</div>
       </div>
@@ -446,11 +454,10 @@
         apiKey: "AIzaSyCT0RLrdDABrbeMvllHyLtVMRZM4dthO9M",
         authDomain: "space-rocks-f4125.firebaseapp.com",
         projectId: "space-rocks-f4125",
-        storageBucket: "space-rocks-f4125.firebasestorage.app",
+        storageBucket: "space-rocks-f4125.appspot.com",
         messagingSenderId: "882582684443",
         appId: "1:882582684443:web:10044e7879d4c26f1b49be",
       }
-
       // Initialize Firebase
       const app = initializeApp(firebaseConfig)
       const db = getFirestore(app)
@@ -541,9 +548,9 @@
         const mobileControls = document.getElementById("mobileControls")
         if (mobileControls) {
           if (screenId === "gameScreen") {
-            mobileControls.classList.add("active")
+            mobileControls.style.display = "flex"
           } else {
-            mobileControls.classList.remove("active")
+            mobileControls.style.display = "none"
           }
         }
       }
@@ -561,6 +568,8 @@
           "estúpido",
           "tonto",
           "imbecil",
+          "marihuana",
+          "marihuano",
           "imbécil",
           "maldito",
           "maldita",
