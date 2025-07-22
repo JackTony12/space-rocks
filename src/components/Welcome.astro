@@ -324,12 +324,46 @@
       .myurl {
         color: rgb(11, 11, 41);
       }
+      /* Loader neón */
+      .neon-loader {
+        width: 80px;
+        height: 80px;
+        border: 8px solid #00ffff44;
+        border-top: 8px solid #ff00ff;
+        border-radius: 50%;
+        animation: neon-spin 1s linear infinite;
+        box-shadow:
+          0 0 30px #00ffff,
+          0 0 60px #ff00ff;
+        margin-top: 60px;
+      }
+      @keyframes neon-spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body>
     <div class='stars' id='stars'></div>
 
     <div class='game-container'>
+      <!-- Pantalla de carga -->
+      <div
+        id='loadingScreen'
+        class='screen active'
+        style='display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 30, 0.98); z-index: 99999;'
+      >
+        <div class='neon-loader'></div>
+        <h2
+          style='margin-top: 30px; color: #00ffff; font-size: 2em; text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;'
+        >
+          Cargando...
+        </h2>
+      </div>
       <!-- Pantalla de Inicio -->
       <div id='startScreen' class='screen active'>
         <h1>🚀 SPACE ROCKS</h1>
@@ -511,7 +545,7 @@
         x:
           canvas && canvas instanceof HTMLCanvasElement
             ? canvas.width / 2 - 25
-            : 375,
+            : 175,
         y:
           canvas && canvas instanceof HTMLCanvasElement
             ? canvas.height - 80
@@ -527,6 +561,21 @@
       let particles = []
       /** @type {{[key: string]: boolean}} */
       let keys = {}
+
+      // Imagen del meteoro
+      const meteorImg = new window.Image()
+      meteorImg.src = "/src/assets/images/meteoro.png"
+      let meteorImgLoaded = false
+      meteorImg.onload = () => {
+        meteorImgLoaded = true
+      }
+      // Imagen de la nave
+      const naveImg = new window.Image()
+      naveImg.src = "/src/assets/images/nave.png"
+      let naveImgLoaded = false
+      naveImg.onload = () => {
+        naveImgLoaded = true
+      }
 
       // las estrellas papuuuuu
       function createStars() {
@@ -864,36 +913,28 @@
           const y = (i * 23 + Date.now() * 0.05) % canvas.height
           ctx.fillRect(x, y, 1, 1)
         }
-        // Dibujar la nave, aunque me quedo bien fea jajaa
-        ctx.fillStyle = "#00ffff"
-        ctx.fillRect(ship.x + 20, ship.y, 10, 40)
-        ctx.fillRect(ship.x, ship.y + 20, 50, 20)
-        ctx.fillRect(ship.x + 10, ship.y + 40, 30, 20)
-        ctx.fillStyle = "#ff6600"
-        ctx.fillRect(ship.x + 5, ship.y + 55, 8, 10)
-        ctx.fillRect(ship.x + 37, ship.y + 55, 8, 10)
+        // Dibujar la imagen de la nave sobre la nave base (la nave base es invisible)
+        if (naveImgLoaded) {
+          ctx.drawImage(naveImg, ship.x, ship.y, ship.width, ship.height)
+        }
         meteors.forEach((meteor) => {
-          ctx.save()
-          ctx.translate(
-            meteor.x + meteor.width / 2,
-            meteor.y + meteor.height / 2
-          )
-          ctx.rotate(meteor.rotation)
-          ctx.fillStyle = "#8B4513"
-          ctx.fillRect(
-            -meteor.width / 2,
-            -meteor.height / 2,
-            meteor.width,
-            meteor.height
-          )
-          ctx.fillStyle = "#654321"
-          ctx.fillRect(
-            -meteor.width / 2 + 5,
-            -meteor.height / 2 + 5,
-            meteor.width - 10,
-            meteor.height - 10
-          )
-          ctx.restore()
+          if (meteorImgLoaded) {
+            ctx.save()
+            ctx.translate(
+              meteor.x + meteor.width / 2,
+              meteor.y + meteor.height / 2
+            )
+            ctx.rotate(meteor.rotation)
+            ctx.drawImage(
+              meteorImg,
+              -meteor.width / 2,
+              -meteor.height / 2,
+              meteor.width,
+              meteor.height
+            )
+            ctx.restore()
+          }
+          // Si la imagen no está cargada, no dibujamos nada (pero la hitbox sigue funcionando)
         })
         particles.forEach((particle) => {
           ctx.fillStyle = `rgba(255, ${Math.floor((255 * particle.life) / particle.maxLife)}, 0, ${particle.life / particle.maxLife})`
@@ -1228,6 +1269,11 @@
           badWordModal.style.display = "none"
         })
       }
+      // Pantalla de carga inicial
+      const loadingScreen = document.getElementById("loadingScreen")
+      setTimeout(() => {
+        if (loadingScreen) loadingScreen.style.display = "none"
+      }, 2000)
     </script>
   </body>
 </html>
