@@ -517,7 +517,6 @@
         serverTimestamp,
       }
     </script>
-
     <script>
       // @ts-nocheck
       // @ts-ignore
@@ -542,6 +541,20 @@
       let meteorSpawnRate = 0.015 // Frecuencia inicial de aparición simoon
       let gameTime = 0
 
+      // Variables para el sistema de monedas
+      let coinSpawnTimer = 0
+      let coinSpawnInterval = 600 // 10 segundos a 60 FPS (10 * 60 = 600 frames)
+
+      // Variables para texto flotante
+      /** @type {Array<{x: number, y: number, text: string, life: number, maxLife: number, vy: number}>} */
+      let floatingTexts = []
+
+      // Audio del juego
+      const backgroundMusic = new Audio()
+      backgroundMusic.src = "/public/music/musicafondo.mp3"
+      backgroundMusic.loop = true
+      backgroundMusic.volume = 0.5
+
       // Objetos del juego
       let ship = {
         x:
@@ -559,6 +572,8 @@
 
       /** @type {Array<{x: number, y: number, width: number, height: number, speed: number, rotation: number}>} */
       let meteors = []
+      /** @type {Array<{x: number, y: number, width: number, height: number, speed: number, rotation: number}>} */
+      let coins = []
       /** @type {Array<{x: number, y: number, vx: number, vy: number, life: number, maxLife: number}>} */
       let particles = []
       /** @type {{[key: string]: boolean}} */
@@ -578,6 +593,14 @@
       naveImg.onload = () => {
         naveImgLoaded = true
       }
+      // imagen de la moneda
+      const coinImage = new window.Image()
+      coinImage.src = "/images/moneda.png"
+      let coinImgLoaded = false
+      coinImage.onload = () => {
+        coinImgLoaded = true
+      }
+      console.log(coinImage)
 
       // las estrellas papuuuuu
       function createStars() {
@@ -794,13 +817,27 @@
         gameSpeed = 1
         meteorSpawnRate = 0.015
         gameTime = 0
+        coinSpawnTimer = 0 // Reiniciar timer de monedas
         // Reiniciar objetos
         ship.x =
           canvas && canvas instanceof HTMLCanvasElement
             ? canvas.width / 2 - 25
             : 375
         meteors = []
+        coins = [] // Reiniciar array de monedas
         particles = []
+        floatingTexts = [] // Reiniciar textos flotantes
+
+        // Iniciar música de fondo
+        try {
+          backgroundMusic.currentTime = 0
+          backgroundMusic
+            .play()
+            .catch((e) => console.log("Error al reproducir música:", e))
+        } catch (error) {
+          console.log("Error con el audio:", error)
+        }
+
         showScreen("gameScreen")
         gameRunning = true
         gameLoop()
@@ -834,6 +871,21 @@
         })
       }
 
+      // Nueva función para crear monedas
+      function createCoin() {
+        coins.push({
+          x:
+            canvas && canvas instanceof HTMLCanvasElement
+              ? Math.random() * (canvas.width - 50)
+              : Math.random() * (800 - 50),
+          y: -50,
+          width: 50,
+          height: 50,
+          speed: 2 + Math.random() * 2, // Velocidad más lenta que los meteoros
+          rotation: 0,
+        })
+      }
+
       function createParticle(x: number, y: number) {
         for (let i = 0; i < 8; i++) {
           particles.push({
@@ -847,8 +899,45 @@
         }
       }
 
+      // Nueva función para crear texto flotante
+      // Nueva función para crear partículas doradas cuando se recoge una moneda
+      function createCoinParticle(x: number, y: number) {
+        for (let i = 0; i < 12; i++) {
+          particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 25,
+            maxLife: 25,
+          })
+        }
+      }
+
+      // Nueva función para crear texto flotante
+      function createFloatingText(x, y, text) {
+        floatingTexts.push({
+          x: x,
+          y: y,
+          text: text,
+          life: 60, // 1 segundo a 60 FPS
+          maxLife: 60,
+          vy: -2, // Velocidad hacia arriba
+        })
+      }
+
       function updateGame() {
         gameTime++
+
+        // Incrementar timer de monedas
+        coinSpawnTimer++
+
+        // Crear moneda cada 10 segundos (600 frames a 60 FPS)
+        if (coinSpawnTimer >= coinSpawnInterval) {
+          createCoin()
+          coinSpawnTimer = 0 // Reiniciar timer
+        }
+
         // Mover nave
         if (keys["ArrowLeft"] && ship.x > 0) {
           ship.x -= ship.speed
@@ -891,6 +980,43 @@
             gameOver()
           }
         })
+
+        // Actualizar monedas
+        coins.forEach((coin, coinIndex) => {
+          coin.y += coin.speed
+          coin.rotation += 0.05 // Rotación más lenta para las monedas
+
+          // Remover moneda si sale de pantalla
+          if (
+            canvas &&
+            canvas instanceof HTMLCanvasElement &&
+            coin.y > canvas.height
+          ) {
+            coins.splice(coinIndex, 1)
+          }
+
+          // Detectar colisión con la nave
+          if (
+            coin.x < ship.x + ship.width &&
+            coin.x + coin.width > ship.x &&
+            coin.y < ship.y + ship.height &&
+            coin.y + coin.height > ship.y
+          ) {
+            // Crear partículas doradas al recoger moneda
+            createCoinParticle(
+              coin.x + coin.width / 2,
+              coin.y + coin.height / 2
+            )
+
+            // Crear texto flotante "+50"
+            createFloatingText(coin.x + coin.width / 2, coin.y, "+50")
+
+            // Remover moneda y sumar puntos
+            coins.splice(coinIndex, 1)
+            score += 50 // Sumar 50 puntos por moneda
+          }
+        })
+
         // Actualizar partículas para mas bonito
         particles.forEach((particle, particleIndex) => {
           particle.x += particle.vx
@@ -900,6 +1026,16 @@
             particles.splice(particleIndex, 1)
           }
         })
+
+        // Actualizar textos flotantes
+        floatingTexts.forEach((text, textIndex) => {
+          text.y += text.vy
+          text.life--
+          if (text.life <= 0) {
+            floatingTexts.splice(textIndex, 1)
+          }
+        })
+
         score += 2
         const currentScoreEl = document.getElementById("currentScore")
         if (currentScoreEl) currentScoreEl.textContent = score.toString()
@@ -919,6 +1055,8 @@
         if (naveImgLoaded) {
           ctx.drawImage(naveImg, ship.x, ship.y, ship.width, ship.height)
         }
+
+        // Dibujar meteoros
         meteors.forEach((meteor) => {
           if (meteorImgLoaded) {
             ctx.save()
@@ -938,9 +1076,57 @@
           }
           // Si la imagen no está cargada, no dibujamos nada (pero la hitbox sigue funcionando)
         })
+
+        // Dibujar monedas
+        coins.forEach((coin) => {
+          if (coinImgLoaded) {
+            ctx.save()
+            ctx.translate(coin.x + coin.width / 2, coin.y + coin.height / 2)
+            ctx.rotate(coin.rotation)
+            ctx.drawImage(
+              coinImage,
+              -coin.width / 2,
+              -coin.height / 2,
+              coin.width,
+              coin.height
+            )
+            ctx.restore()
+          } else {
+            // Fallback: dibujar círculo dorado si la imagen no carga
+            ctx.fillStyle = "#FFD700"
+            ctx.beginPath()
+            ctx.arc(
+              coin.x + coin.width / 2,
+              coin.y + coin.height / 2,
+              coin.width / 2,
+              0,
+              Math.PI * 2
+            )
+            ctx.fill()
+            ctx.strokeStyle = "#FFA500"
+            ctx.lineWidth = 2
+            ctx.stroke()
+          }
+        })
+
+        // Dibujar partículas (algunas serán doradas para las monedas)
         particles.forEach((particle) => {
-          ctx.fillStyle = `rgba(255, ${Math.floor((255 * particle.life) / particle.maxLife)}, 0, ${particle.life / particle.maxLife})`
+          // Las partículas de las monedas serán doradas
+          if (particle.maxLife === 25) {
+            ctx.fillStyle = `rgba(255, ${Math.floor((215 * particle.life) / particle.maxLife)}, 0, ${particle.life / particle.maxLife})`
+          } else {
+            ctx.fillStyle = `rgba(255, ${Math.floor((255 * particle.life) / particle.maxLife)}, 0, ${particle.life / particle.maxLife})`
+          }
           ctx.fillRect(particle.x, particle.y, 3, 3)
+        })
+
+        // Dibujar textos flotantes
+        floatingTexts.forEach((floatingText) => {
+          const alpha = floatingText.life / floatingText.maxLife
+          ctx.fillStyle = `rgba(255, 215, 0, ${alpha})` // Color dorado con transparencia
+          ctx.font = "bold 20px Arial"
+          ctx.textAlign = "center"
+          ctx.fillText(floatingText.text, floatingText.x, floatingText.y)
         })
       }
 
@@ -954,6 +1140,10 @@
       function gameOver() {
         gameRunning = false
         if (animationId !== undefined) cancelAnimationFrame(animationId)
+
+        // Pausar música
+        backgroundMusic.pause()
+
         const finalScoreEl = document.getElementById("finalScore")
         if (finalScoreEl) finalScoreEl.textContent = score.toString()
         showScreen("gameOverScreen")
